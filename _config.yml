@@ -25,7 +25,7 @@ github_username:  jczartek
 
 # Build settings
 markdown: kramdown
-theme:      tale
+theme:      jekyll-theme-time-machine
 permalink:  /:year-:month-:day/:title
 paginate: 5
 #theme: minima
