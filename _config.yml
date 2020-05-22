@@ -1,0 +1,10 @@
+title: using blogmatic
+baseurl: ""
+
+markdown: kramdown
+
+include:
+  - _pages
+
+plugins:
+  - jekyll-feed
