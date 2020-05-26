@@ -4,5 +4,3 @@ title: "About"
 author: "Jakub Czartek"
 permalink: /about/
 ---
-
-# Hello World!

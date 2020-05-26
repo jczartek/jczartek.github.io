@@ -1,4 +1,5 @@
 title: using blogmatic
+author: Jakub Czartek
 baseurl: ""
 
 markdown: kramdown
