@@ -11,9 +11,9 @@ Artykuł będzie poświęcony tworzeniu pluginów przy pomocy biblioteki *libpea
 
 Do poniższych przykładów będą potrzebne następujące bilioteki oraz kompilatory:
 
-* Gtk+ (wersji 3); 
+* Gtk+ (wersji 3);
 * Vala
-* libpeas, 
+* libpeas,
 * gobject-introspection
 * gcc lub clang
 * python3
@@ -76,7 +76,7 @@ namespace Extensya {
 
     private void unload_plugins() {
       foreach (var plugin in engine.get_plugin_list()) {
-        if(!engine.try_unload_plugin(plugin)) 
+        if(!engine.try_unload_plugin(plugin))
         {
           warning("Can't unload the plugin %s", plugin.get_name());
         }
@@ -87,9 +87,9 @@ namespace Extensya {
 ```
 Klasa __*Peas.Engine*__ jest sercem mechanizmu zarządania wtyczkami w bibliotece *libpeas*. Rolą silnika wtyczek jest zapewnienie wszystkich potrzebnych informacji o wszystkich dostępnych pluginach, a także dostarczenie API do zarządzania i kontrolowania wtyczek wewnątrz aplikacji. W naszej aplikacji pobieramy domyślny silnik wtyczek za pomocą metody statycznej *Peas.Engine.get_default()*.
 
-Logika zarządzania wtyczkami w klasie __*Application*__ jest umieszczona w trzech prywatnych metodach. Pierwszą rzeczą jaką robimy jest skonfigurowania silnia wtyczek, aby poprawnie wyszukiwał pluginy i załadował loader-a dla języka python. W metodzie *configure_plugins()* dodajemy, przy pomocy metody *add_serach_path()*, ściężkę do katalogu z naszymi pluginami (w naszej aplikacji wszystkie pluginy umieszczamy w podkatalogu *./plugins*). Metoda *add_search_path()* umieszcza dodaną ścieżkę na końcu listy. Oprócz tej metody istnieje jeszcze metoda *prepend_search_path()*, która dodaje ścieżkę na początek listy. Wspomninane metody przyjmują dwa parametry, gdzie pierwszy parametr to ścieżka do modułu wtyczki, a kolejny to ścieżka do danych pluginu. Drugi parametr może być __NULL__, wtedy ścieżka do danych jest taka sama jak do modułu.
+Logika zarządzania wtyczkami w klasie __*Application*__ jest umieszczona w trzech prywatnych metodach. Pierwszą rzeczą jaką robimy jest skonfigurowanie silnika wtyczek, aby poprawnie wyszukiwał pluginy i załadował loader-a dla języka python. W metodzie *configure_plugins()* dodajemy, przy pomocy metody *add_serach_path()*, ściężkę do katalogu z naszymi pluginami (w naszej aplikacji wszystkie pluginy umieszczamy w podkatalogu *./plugins*). Metoda *add_search_path()* umieszcza dodaną ścieżkę na końcu listy. Oprócz tej metody istnieje jeszcze metoda *prepend_search_path()*, która dodaje ścieżkę na początek listy. Wspomninane metody przyjmują dwa parametry, gdzie pierwszy parametr to ścieżka do modułu wtyczki, a kolejny to ścieżka do danych pluginu. Drugi parametr może być __NULL__, wtedy ścieżka do danych jest taka sama jak do modułu.
 
-Następnie w metodzie *load_plugins()* przeprowadzamy rzeczywiste załadowanie wszystkich wtyczek. Za pomocą metody *get_plugin_list()* pobieramy listę wszystkich znalezionych wtyczek. Metoda zwraca listę obiektów __*Peas.PluginInfo*__. Natępnie iterujmy po pobranej liście i ładujemy wszystkie znalezione pluginy za pomocą metody *try_load_plugin()*. Jeżeli jakaś wtyczka nie może być załadowana, to wyświetlamy odpowiedni komunikat. Wszystkie wtyczki zostaną załadowne już po utworzeniu głównego okna aplikacji.
+Następnie w metodzie *load_plugins()* przeprowadzamy rzeczywiste załadowanie wszystkich wtyczek. Za pomocą metody *get_plugin_list()* pobieramy listę wszystkich znalezionych wtyczek. Metoda zwraca listę obiektów __*Peas.PluginInfo*__. Następnie iterujmy po pobranej liście i ładujemy wszystkie znalezione pluginy za pomocą metody *try_load_plugin()*. Jeżeli jakaś wtyczka nie może być załadowana, to wyświetlamy odpowiedni komunikat. Wszystkie wtyczki zostaną załadowne już po utworzeniu głównego okna aplikacji.
 
 W metodzie *unload_plugins()* odłączamy wszystkie pluginy, gdy aplikacja jest zamykana (gdy wywoływana jest funkcja wirtualna *shutdown()*). Do odłączenie wtyczek używamy metody *try_unload_plugin()*.
 
@@ -110,7 +110,7 @@ namespace Extensya {
   }
 }
 ```
-Zanim przejdziemy do omówienia kodu w klasie *__Window__* należy powiedzieć kilka słów o zdefiniowanym powyżej interfejsie __*WindowExtension*__. Jest to właściwy interfejs, który będzie implementowany przez jedną z klas we wszystkich później napisanych pluginach. Taka mała dygresja związana z nazewnictwem. Przez wtyczkę czy plugin rozumiem bibliotekę (plik z końcówką .so), która składa się z jednej (jak w naszym przypadku) lub kilku klas, które implementują podobne interfejsy, jak ten powyżej. Wyjaśnię to na następującym przykładzie: nasza aplikacja może składać się z kilkudziesięciu klas i jeśli chcemy, aby do naszych klas można było dodać dodatkową funkcjonalność, poprzez wtyczki, to musimy przygotować dla każdej klasy odpowiedni interfejs, który będzie musiał być implementowany przez jakąś klasę umieszoną w pluginie, dalej zwaną przeze mnie *__klasą rozszerzającą__* (w naszym przykładzie rozszerzaną klasą jest klasa *__Window__*). Dobrze jest nazywać interfejsy umieszając w nazwie rozszerzaną klasę. 
+Zanim przejdziemy do omówienia kodu w klasie *__Window__* należy powiedzieć kilka słów o zdefiniowanym powyżej interfejsie __*WindowExtension*__. Jest to właściwy interfejs, który będzie implementowany przez jedną z klas we wszystkich później napisanych pluginach. Taka mała dygresja związana z nazewnictwem. Przez wtyczkę czy plugin rozumiem bibliotekę (plik z końcówką .so), która składa się z jednej (jak w naszym przypadku) lub kilku klas, które implementują podobne interfejsy, jak ten powyżej. Wyjaśnię to na następującym przykładzie: nasza aplikacja może składać się z kilkudziesięciu klas i jeśli chcemy, aby do naszych klas można było dodać dodatkową funkcjonalność, poprzez wtyczki, to musimy przygotować dla każdej klasy odpowiedni interfejs, który będzie musiał być implementowany przez jakąś klasę umieszoną w pluginie, dalej zwaną przeze mnie *__klasą rozszerzającą__* (w naszym przykładzie rozszerzaną klasą jest klasa *__Window__*). Dobrze jest nazywać interfejsy umieszając w nazwie rozszerzaną klasę.
 
 W interfejsie *__WindowExtension__* zdefiniowaliśmy dwie metody abstrakcyjne oraz abstrakcyjną właściwość. Metoda *activate()* będzie wywołana zaraz po utworzeniu obiektu klasy rozszerzajacej, a metoda *deactivate()* gdy obiekt jest niszczony. W zasadzie metody te będą wywoływane przy załadowniu i odłączeniu wtyczki. Również możemy sami wywoływać wyżej wspomniane metody używając metody instancyjnej *foreach()* klasy *__Peas.ExtensionSet__*. Ostatnią klasą jaką musimy stworzyć jest klasa Window. Kod znajduję się poniżej.
 
@@ -170,11 +170,11 @@ namespace Extensya {
               warning("Can't load the plugin %s", plugin.get_name());
             }
           }
-        } 
+        }
         else
         {
           foreach (var plugin in engine.get_plugin_list()) {
-            if(!engine.try_unload_plugin(plugin)) 
+            if(!engine.try_unload_plugin(plugin))
             {
               warning("Can't unload the plugin %s", plugin.get_name());
             }
@@ -195,7 +195,7 @@ namespace Extensya {
 }
 
 ```
-Klasa Window ma dwie funkcje: tworzy proste okienko z przyciskiem i przełącznikiem do ręcznego włączania/wyłączania wtyczek, a także musi utworzyć wszystkie obiekty, których klasy implementują interfejs WindowExtension. Tworzenie tych obiektów zostawiamy klasie Peas.ExtensioSet, której obiekt tworzymy w konstruktorze klasy Window. Do konstruktora klasy Peas.ExtensionSet podajemy argumenty: domyślny silnik wtyczek, typ interfejsu jaki musi implementować klasa, aby jego obiekt został utworzony przez Peas.ExtensionSet, oraz nazwy właściwości i ich wartości. Aby móc wywołać metody, które zostały zdefiniowane w interfejsie WindowExtension należy subskrybować zdarzenia "extension-added" oraz "extension-removed". Zdarzenia te są odpowiednio publikowane przy włączaniu i odłączaniu wtyczek. Gdy emitowane jest zdarzenie "extension-added" zostanie wywołana metoda activate(), a przy emitowaniu zdarzenia "extension-removed" zostanie wywołana metoda deactivate(). Klasa Window udostępnia także dwie metody publiczne do umieszczania oraz ususwania przycisków. Te metody będą stanowić publiczne API naszej biblioteki. 
+Klasa Window ma dwie funkcje: tworzy proste okienko z przyciskiem i przełącznikiem do ręcznego włączania/wyłączania wtyczek, a także musi utworzyć wszystkie obiekty, których klasy implementują interfejs WindowExtension. Tworzenie tych obiektów zostawiamy klasie Peas.ExtensioSet, której obiekt tworzymy w konstruktorze klasy Window. Do konstruktora klasy Peas.ExtensionSet podajemy argumenty: domyślny silnik wtyczek, typ interfejsu jaki musi implementować klasa, aby jego obiekt został utworzony przez Peas.ExtensionSet, oraz nazwy właściwości i ich wartości. Aby móc wywołać metody, które zostały zdefiniowane w interfejsie WindowExtension należy subskrybować zdarzenia "extension-added" oraz "extension-removed". Zdarzenia te są odpowiednio publikowane przy włączaniu i odłączaniu wtyczek. Gdy emitowane jest zdarzenie "extension-added" zostanie wywołana metoda activate(), a przy emitowaniu zdarzenia "extension-removed" zostanie wywołana metoda deactivate(). Klasa Window udostępnia także dwie metody publiczne do umieszczania oraz ususwania przycisków. Te metody będą stanowić publiczne API naszej biblioteki.
 
 Powyższy kod należy skompilować:
 
@@ -248,4 +248,4 @@ I następnie uruchom program:
 ```
 ./extensya
 ```
-Powinno ukazać się okno z jednym przyciskiem. W następnym artykulu zostanie opisane tworzenie już właściwych wtyczek.
+Powinno ukazać się okno z jednym przyciskiem. W następnym artykule opiszę tworzenie już właściwych wtyczek.
