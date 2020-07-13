@@ -5,7 +5,7 @@ title: Tworzenie wtyczek libpeas. Biblioteka.
 date:   2020-05-27 08:29:41 +0200
 ---
 
-Artykuł będzie poświęcony tworzeniu pluginów przy pomocy biblioteki *libpeas*, która wchodzi w skład platformy deweloperskiej __GNOME__. *Libpeas* została zaprojektowana aby pracować z technologią *GObject*. Biblioteka dostarcza dość proste API, i dlatego rozszerzenie aplikacji napisanej w *gtk+3.0*, o możliwość dynamicznego ładowanie wtyczek, nie powinno nastręczać żadnych trudności. Na potrzeby artykuły użyty zostnie język programowania Vala. Aczkolwiek przykłady zawarte w niniejszym artykule są bardzo trywialne, więc przepisanie ich do języka C nie powinno sprawiać jakichkolwiek problemów. Przykłady można znaleźć pod tym [linkiem](https://github.com/jczartek/sources-for-using-blogmatic/tree/master/PluginyPeas/pisanie-wtyczek-dla-gtk).
+Artykuł będzie poświęcony tworzeniu pluginów przy pomocy biblioteki *libpeas*, która wchodzi w skład platformy deweloperskiej __GNOME__. *Libpeas* została zaprojektowana aby pracować z technologią *GObject*. Biblioteka dostarcza dość proste API, i dlatego rozszerzenie aplikacji napisanej w *gtk+3.0*, o możliwość dynamicznego ładowanie wtyczek, nie powinno nastręczać żadnych trudności. Na potrzeby artykułu użyty zostnie język programowania Vala. Aczkolwiek przykłady zawarte w niniejszym artykule są bardzo trywialne, więc przepisanie ich do języka C nie powinno sprawiać jakichkolwiek problemów. Przykłady można znaleźć pod tym [linkiem](https://github.com/jczartek/sources-for-using-blogmatic/tree/master/PluginyPeas/pisanie-wtyczek-dla-gtk).
 
 ## Wymagania
 
@@ -193,27 +193,24 @@ namespace Extensya {
     }
   }
 }
-
 ```
-Klasa Window ma dwie funkcje: tworzy proste okienko z przyciskiem i przełącznikiem do ręcznego włączania/wyłączania wtyczek, a także musi utworzyć wszystkie obiekty, których klasy implementują interfejs WindowExtension. Tworzenie tych obiektów zostawiamy klasie Peas.ExtensioSet, której obiekt tworzymy w konstruktorze klasy Window. Do konstruktora klasy Peas.ExtensionSet podajemy argumenty: domyślny silnik wtyczek, typ interfejsu jaki musi implementować klasa, aby jego obiekt został utworzony przez Peas.ExtensionSet, oraz nazwy właściwości i ich wartości. Aby móc wywołać metody, które zostały zdefiniowane w interfejsie WindowExtension należy subskrybować zdarzenia "extension-added" oraz "extension-removed". Zdarzenia te są odpowiednio publikowane przy włączaniu i odłączaniu wtyczek. Gdy emitowane jest zdarzenie "extension-added" zostanie wywołana metoda activate(), a przy emitowaniu zdarzenia "extension-removed" zostanie wywołana metoda deactivate(). Klasa Window udostępnia także dwie metody publiczne do umieszczania oraz ususwania przycisków. Te metody będą stanowić publiczne API naszej biblioteki.
+Klasa Window ma dwie funkcje: tworzy proste okienko z przyciskiem i przełącznikiem do ręcznego włączania/wyłączania wtyczek, a także musi utworzyć wszystkie obiekty, których klasy implementują interfejs WindowExtension. Tworzenie tych obiektów zostawiamy klasie *__Peas.ExtensioSet__*, której obiekt tworzymy w konstruktorze klasy Window. Do konstruktora klasy Peas.ExtensionSet podajemy argumenty: domyślny silnik wtyczek, typ interfejsu jaki musi implementować klasa, aby jego obiekt został utworzony przez Peas.ExtensionSet, oraz nazwy właściwości i ich wartości. Aby móc wywołać metody, które zostały zdefiniowane w interfejsie WindowExtension należy subskrybować zdarzenia "extension-added" oraz "extension-removed". Zdarzenia te są odpowiednio publikowane przy włączaniu i odłączaniu wtyczek. Gdy emitowane jest zdarzenie "extension-added" zostanie wywołana metoda activate(), a przy emitowaniu zdarzenia "extension-removed" zostanie wywołana metoda deactivate(). Klasa Window udostępnia także dwie metody publiczne do umieszczania oraz ususwania przycisków. Te metody będą stanowić publiczne API naszej biblioteki.
 
 Powyższy kod należy skompilować:
 
-```bash
+```
 valac -o libextensya.so --library extensya -H extensya.h  --gir Extensya-1.0.gir  -X -shared -X -fPIC --pkg libpeas-1.0 --pkg gtk+-3.0 extensya-application.vala extensya-window.vala extensya-extension.vala
-
 ```
 
 Następnie musimy wygenerować plik potrzebny dla wtyczek pisanych w pythonie. Zrobimy to następująco:
 
-```bash
+```
 g-ir-compiler --shared-library libextensya Extensya-1.0.gir -o Extensya-1.0.typelib
 ```
 
 ## Program
 
 Następnie musimy stworzyć plik wykonywalny dla naszej aplikacji. Zawartość pliku jest dość prosta i przedstawia się następująco:
-
 ```c#
 // Plik źródłowy: launcher.vala
 
@@ -223,28 +220,20 @@ int main(string [] args) {
 }
 ```
 Zapisz plik jako *lanucher.vala* i skompiluj go:
-
-```bash
+```
 valac -o extensya launcher.vala --vapidir . --pkg gtk+-3.0 --pkg libpeas-1.0 --pkg extensya -X -I. -X -L. -X -lextensya
-
 ```
 Kilka dodatkowych opcji zostało włączonych, aby upewnić się, że pliki naszej biblioteki zostaną poprawnie znalezione. Jeśli spróbujesz teraz uruchomić program to dostaniesz komunikat błędu:
-
-```bash
+```
 ./extensya
-
 /extensya: error while loading shared libraries: libextensya.so: cannot open shared object file: No such file or directory
-
 ```
 Program się nie uruchomił dlatego, że biblioteke libextensya.so nie została zainstalowana we właściwym katalogu przeszukiwania. Aby uruchomić nasz program trzeba ustawiać zmienną środowiskową __LD_LIBRATY_PATH__, aby wskazywała bieżący katalog. Odrazu ustawimy drugą zmienną środowiskową __GI_TYPELIB_PATH__, aby wtyczki napisana w pythonie poprawnie odszukiwały plik typelib. Wpisz w konsoli:
-
-```bash
+```
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 export GI_TYPELIB_PATH=.:$GI_TYPELIB_PATH
 ```
-
 I następnie uruchom program:
-
 ```
 ./extensya
 ```

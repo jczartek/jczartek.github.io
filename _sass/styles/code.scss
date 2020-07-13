@@ -1,0 +1,19 @@
+pre,
+code {
+  font-family: $monospaced;
+}
+
+code {
+  border-radius: 3px;
+  font-size: 85%;
+  color: $white;
+}
+
+.highlight {
+  background: $dark2;
+  color: $white;
+  padding: .25em;
+  border-radius: 3px;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
